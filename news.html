@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>News | Taha Aboshanab</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .pdf-container {
+      height: 800px;
+      border: 1px solid #ccc;
+      margin-bottom: 2rem;
+    }
+    iframe {
+      border: none;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -24,15 +36,21 @@
   <main>
     <section class="card">
       <h2>Article 1</h2>
-      <iframe src="article1.pdf" width="100%" height="600px"></iframe>
+      <div class="pdf-container">
+        <iframe src="https://mozilla.github.io/pdf.js/web/viewer.html?file=Testimonies/momentum.pdf"></iframe>
+      </div>
     </section>
     <section class="card">
       <h2>Article 2</h2>
-      <iframe src="article2.pdf" width="100%" height="600px"></iframe>
+      <div class="pdf-container">
+        <iframe src="https://mozilla.github.io/pdf.js/web/viewer.html?file=Testimonies/BUE.pdf"></iframe>
+      </div>
     </section>
     <section class="card">
       <h2>Article 3</h2>
-      <iframe src="article3.pdf" width="100%" height="600px"></iframe>
+      <div class="pdf-container">
+        <iframe src="https://mozilla.github.io/pdf.js/web/viewer.html?file=Testimonies/ISEE.pdf"></iframe>
+      </div>
     </section>
   </main>
 
