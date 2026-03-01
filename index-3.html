@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Taha Aboshanab | Physicist</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --cream:   #f5f2ee;
+      --accent:  #c8a96e;
+      --dark:    #1a1a1a;
+      --nav-h:   52px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Jost', sans-serif;
+      background: #111;
+      color: var(--cream);
+      overflow-x: hidden;
+    }
+
+    /* ══════════════════════════════════════
+       FIXED NAV — transparent, always on top
+    ══════════════════════════════════════ */
+    .site-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2.6rem;
+      padding: 0 2rem;
+      background: transparent;
+      transition: background 0.5s ease, backdrop-filter 0.5s ease;
+    }
+
+    .site-nav.dark-bg {
+      background: rgba(10,10,10,0.62);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(200,169,110,0.10);
+    }
+
+    .site-nav a {
+      text-decoration: none;
+      color: rgba(245, 242, 238, 0.70);
+      font-family: 'Jost', sans-serif;
+      font-size: 0.74rem;
+      font-weight: 500;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      transition: color 0.25s;
+      padding-bottom: 2px;
+    }
+
+    .site-nav a:hover { color: var(--accent); }
+
+    .site-nav a.active {
+      color: var(--accent);
+      border-bottom: 1px solid var(--accent);
+    }
+
+    /* ══════════════════════════════════════
+       BACKGROUND LAYER STACK
+       All layers sit fixed behind everything.
+       JS crossfades them by toggling .active.
+    ══════════════════════════════════════ */
+    .bg-stack {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .bg-layer {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0;
+      transition: opacity 1.0s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .bg-layer.active { opacity: 1; }
+
+    /* Dark overlay on every layer for text legibility */
+    .bg-layer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.62);
+    }
+
+    /* ✏️ EDIT: replace filenames below with your actual uploaded image names.
+       bg1.jpeg = Home, bg2.jpeg = Resume, bg3.jpeg = Projects … etc.
+       The first one reuses your existing background.jpeg.               */
+    #bg-home     { background-image: url('background.jpeg'); background-color: #1a2a1e; }
+    #bg-resume   { background-image: url('bg2.jpeg');        background-color: #1a2030; }
+    #bg-projects { background-image: url('bg3.jpeg');        background-color: #1a1a2e; }
+    #bg-startup  { background-image: url('bg4.jpeg');        background-color: #1e1a10; }
+    #bg-news     { background-image: url('bg5.jpeg');        background-color: #10151a; }
+    #bg-about    { background-image: url('bg6.jpeg');        background-color: #1a1018; }
+    #bg-contact  { background-image: url('bg7.jpeg');        background-color: #0e1a14; }
+
+    /* ══════════════════════════════════════
+       PANELS — each full-viewport section
+    ══════════════════════════════════════ */
+    .panel {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: calc(var(--nav-h) + 4rem) 2rem 5rem;
+    }
+
+    /* ── PANEL CONTENT — fades up on enter, fades up-out on leave ── */
+    .panel-content {
+      text-align: center;
+      max-width: 780px;
+      width: 100%;
+      opacity: 0;
+      transform: translateY(36px);
+      transition: opacity 0.80s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.80s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .panel-content.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .panel-content.exit {
+      opacity: 0;
+      transform: translateY(-28px);
+      transition: opacity 0.40s ease,
+                  transform 0.40s ease;
+    }
+
+    /* ── Typography ── */
+    .panel-eyebrow {
+      font-size: 0.70rem;
+      letter-spacing: 0.30em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .panel-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(2.8rem, 6vw, 5.5rem);
+      color: var(--cream);
+      letter-spacing: 0.06em;
+      line-height: 1.08;
+      text-shadow: 0 2px 30px rgba(0,0,0,0.5);
+      margin-bottom: 0.8rem;
+    }
+
+    .panel-sub {
+      font-size: 0.80rem;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-shadow: 0 1px 10px rgba(0,0,0,0.6);
+      margin-bottom: 1.8rem;
+    }
+
+    .panel-divider {
+      width: 44px;
+      height: 1px;
+      background: var(--accent);
+      margin: 1.4rem auto 1.8rem;
+      opacity: 0.55;
+    }
+
+    .panel-body {
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: rgba(245,242,238,0.78);
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    /* ── Scroll hint (home only) ── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      color: rgba(245,242,238,0.42);
+      font-size: 0.66rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      animation: pulse 2.4s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .scroll-hint::after {
+      content: '';
+      width: 1px;
+      height: 36px;
+      background: rgba(200,169,110,0.45);
+      display: block;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.42; }
+      50%       { opacity: 1; }
+    }
+
+    /* ── Placeholder badge (empty sections) ── */
+    .placeholder-badge {
+      display: inline-block;
+      margin-top: 2.2rem;
+      padding: 0.65rem 1.8rem;
+      border: 1px solid rgba(200,169,110,0.35);
+      color: rgba(200,169,110,0.65);
+      font-size: 0.70rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    /* ══════════════════════════════════════
+       RESUME PANEL — left-aligned grid
+    ══════════════════════════════════════ */
+    #resume .panel-content { text-align: left; }
+
+    .resume-preview {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .rp-card {
+      border: 1px solid rgba(200,169,110,0.20);
+      padding: 1.1rem 1.3rem;
+      background: rgba(0,0,0,0.28);
+      backdrop-filter: blur(6px);
+    }
+
+    .rp-card .rp-year {
+      font-size: 0.66rem;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 0.35rem;
+    }
+
+    .rp-card h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--cream);
+      margin-bottom: 0.3rem;
+    }
+
+    .rp-card p {
+      font-size: 0.78rem;
+      color: rgba(245,242,238,0.52);
+      line-height: 1.6;
+    }
+
+    /* ══════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════ */
+    footer {
+      position: relative;
+      z-index: 2;
+      background: #080808;
+      text-align: center;
+      padding: 1.6rem;
+      color: rgba(245,242,238,0.28);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      border-top: 1px solid rgba(200,169,110,0.08);
+    }
+
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ══════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════ */
+    @media (max-width: 640px) {
+      .site-nav { gap: 1.1rem; }
+      .site-nav a { font-size: 0.60rem; letter-spacing: 0.10em; }
+      .resume-preview { grid-template-columns: 1fr; }
+    }
+
+    /* ══════════════════════════════════════
+   NEWS CARDS
+    ══════════════════════════════════════ */
+    .news-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.4rem;
+      margin-top: 2.2rem;
+      max-width: 680px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .news-card {
+      text-decoration: none;
+      display: block;
+      border: 1px solid rgba(200,169,110,0.22);
+      background: rgba(0,0,0,0.30);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: 1.8rem 1.6rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.35s ease, background 0.35s ease, transform 0.35s ease;
+    }
+
+    /* Gold accent line that grows in on hover */
+    .news-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 2px;
+      background: var(--accent);
+      transform: scaleY(0);
+      transform-origin: bottom;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .news-card:hover {
+      border-color: rgba(200,169,110,0.55);
+      background: rgba(0,0,0,0.45);
+      transform: translateY(-3px);
+    }
+
+    .news-card:hover::before { transform: scaleY(1); }
+
+    .news-card-label {
+      font-size: 0.64rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    .news-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--cream);
+      line-height: 1.25;
+      margin-bottom: 0.75rem;
+    }
+
+    .news-card-desc {
+      font-size: 0.80rem;
+      line-height: 1.70;
+      color: rgba(245,242,238,0.50);
+      margin-bottom: 1.2rem;
+    }
+
+    .news-card-cta {
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border-bottom: 1px solid rgba(200,169,110,0.35);
+      padding-bottom: 1px;
+      transition: border-color 0.2s;
+    }
+
+    .news-card:hover .news-card-cta {
+      border-color: var(--accent);
+    }
+
+    @media (max-width: 640px) {
+      .news-grid { grid-template-columns: 1fr; }
+    }
+    /* ══════════════════════════════════════
+   ABOUT ME — TEXT
+    ══════════════════════════════════════ */
+    #about .panel-content {
+      text-align: left;
+      max-width: 680px;
+    }
+
+    .about-text {
+      margin-top: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+
+    .about-para {
+      font-size: 0.96rem;
+      line-height: 1.95;
+      color: rgba(245,242,238,0.75);
+      font-weight: 300;
+    }
+
+    /* First letter drop-cap on the opening paragraph */
+    .about-para:first-child::first-letter {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.2rem;
+      font-weight: 600;
+      color: var(--accent);
+      float: left;
+      line-height: 0.78;
+      margin-right: 0.1em;
+      margin-top: 0.08em;
+    }
+
+    .about-quote {
+      border-left: 2px solid var(--accent);
+      padding: 0.8rem 0 0.8rem 1.6rem;
+      margin: 0.6rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      position: relative;
+    }
+
+    .about-quote-mark {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem;
+      color: var(--accent);
+      opacity: 0.35;
+      line-height: 1;
+      position: absolute;
+      top: -0.3rem;
+      left: 1.4rem;
+    }
+
+    .about-quote p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--cream);
+      line-height: 1.4;
+      padding-left: 1.6rem;
+    }
+
+    .about-quote-attr {
+      font-size: 0.68rem;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0.70;
+      padding-left: 1.6rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ FIXED BACKGROUND STACK ══ -->
+  <div class="bg-stack" aria-hidden="true">
+    <div class="bg-layer active" id="bg-home"></div>
+    <div class="bg-layer"        id="bg-resume"></div>
+    <div class="bg-layer"        id="bg-projects"></div>
+    <div class="bg-layer"        id="bg-startup"></div>
+    <div class="bg-layer"        id="bg-news"></div>
+    <div class="bg-layer"        id="bg-about"></div>
+    <div class="bg-layer"        id="bg-contact"></div>
+  </div>
+
+  <!-- ══ FIXED NAV ══ -->
+  <nav class="site-nav" id="site-nav">
+    <a href="#home"     class="nav-link active">Home</a>
+    <a href="#resume"   class="nav-link">Resume</a>
+    <a href="#projects" class="nav-link">Projects</a>
+    <a href="#startup"  class="nav-link">Startup</a>
+    <a href="#news"     class="nav-link">News</a>
+    <a href="#about"    class="nav-link">About Me</a>
+    <a href="#contact"  class="nav-link">Contact</a>
+  </nav>
+
+  <!-- ══════════════════════════════════════
+       SECTION 1 — HOME
+  ══════════════════════════════════════ -->
+  <section class="panel" id="home" data-bg="bg-home">
+    <div class="panel-content">
+      <p class="panel-eyebrow">Welcome</p>
+      <h1 class="panel-title">Taha Aboshanab</h1>
+      <p class="panel-sub">Physics Specialist &nbsp;·&nbsp; University of Toronto Graduate</p>
+      <div class="panel-divider"></div>
+      <p class="panel-body">
+        Physicist, researcher, educator, and founder — driven by the intersection of
+        fundamental science and real-world impact. Scroll to explore my work.
+      </p>
+    </div>
+    <div class="scroll-hint">Scroll</div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 2 — RESUME
+  ══════════════════════════════════════ -->
+  <section class="panel" id="resume" data-bg="bg-resume">
+    <div class="panel-content">
+      <p class="panel-eyebrow">Curriculum Vitae</p>
+      <h2 class="panel-title">Resume</h2>
+      <!-- <div class="panel-divider"></div>-->
+      <p class="panel-body">
+        Honours Bachelor of Science — Specialist in Physics, Minor in Mathematics,
+        University of Toronto (2025). Six years of research, teaching, and
+        leadership across four countries.
+      </p>
+      <div class="resume-preview">
+        <div class="rp-card">
+          <p class="rp-year">2023 — 2024</p>
+          <h4>Renewable Energy Research</h4>
+          <p>Modeled PSII complexes for sustainable electricity · Miller Group, UofT</p>
+        </div>
+        <div class="rp-card">
+          <p class="rp-year">2025 — 2026</p>
+          <h4>Teaching Assistant</h4>
+          <p>Physics & Mathematics · British University in Egypt & Shorouk University</p>
+        </div>
+        <div class="rp-card">
+          <p class="rp-year">2023 — Present</p>
+          <h4>Tutor-Mentor</h4>
+          <p>250+ students · 3,000+ hours · Physics, Math & Chemistry</p>
+        </div>
+        <div class="rp-card">
+          <p class="rp-year">2024 — 2025</p>
+          <h4>Theatre Supervisor</h4>
+          <p>Isabel Bader Theatre · Supervised operations with staff, clients, and technical teams.</p>
+        </div>
+        <div class="rp-card">
+          <p class="rp-year">2024 — 2025</p>
+          <h4>AI Hackathon Judge</h4>
+          <p>Evaluated innovations applying artificial intelligence to climate, energy, and social impact.</p>
+        </div>
+        <div class="rp-card">
+          <p class="rp-year">2024 — 2025</p>
+          <h4>Orientation Executive</h4>
+          <p>Managed over 130 volunteers implementing inclusive programming for incoming university students.</p>
+        </div>
+      </div>
+      <p style="
+        margin-top: 2.4rem;
+        font-size: 0.76rem;
+        letter-spacing: 0.14em;
+        color: rgba(245,242,238,0.38);
+        font-style: italic;
+        text-align: center;
+      ">
+        For the full curriculum vitae — research, publications, awards, and certifications —
+        reach out via the <a href="#contact" style="color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(200,169,110,0.4);">Contact</a> section below.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 3 — PROJECTS
+  ══════════════════════════════════════ -->
+  <section class="panel" id="projects" data-bg="bg-projects">
+    <div class="panel-content">
+      <p class="panel-eyebrow">Work</p>
+      <h2 class="panel-title">Projects</h2>
+      <div class="panel-divider"></div>
+      <p class="panel-body">
+        A collection of scientific, engineering, and creative projects spanning
+        renewable energy, computational physics, AI, and web development.
+      </p>
+      <div class="placeholder-badge">Content Coming Soon</div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 4 — STARTUP
+  ══════════════════════════════════════ -->
+  <section class="panel" id="startup" data-bg="bg-startup">
+    <div class="panel-content">
+      <p class="panel-eyebrow">Incorporated · July 2025</p>
+      <h2 class="panel-title">Aboshanab<br>Education Inc.</h2>
+      <div class="panel-divider"></div>
+      <p class="panel-body">
+        A research startup advancing renewable energy technology —
+        with active work in nuclear energy, solar technologies, and
+        WIPO patent development for novel energy-extraction techniques.
+        Currently securing funding proposals.
+      </p>
+      <div class="placeholder-badge">More Details Coming Soon</div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 5 — NEWS
+  ══════════════════════════════════════ -->
+  <section class="panel" id="news" data-bg="bg-news">
+    <div class="panel-content">
+      <p class="panel-eyebrow">Latest</p>
+      <h2 class="panel-title">News</h2>
+      <div class="panel-divider"></div>
+      <p class="panel-body">
+        Updates on research, publications, speaking engagements,
+        and milestones from Aboshanab Education Inc. and beyond.
+      </p>
+      <div class="news-grid">
+
+        <a href="testimonies/Momentum.pdf" target="_blank" class="news-card">
+          <div class="news-card-inner">
+            <p class="news-card-label">Award · 2024</p>
+            <h3 class="news-card-title">University Momentum<br>Builders Scholarship</h3>
+            <p class="news-card-desc">Department of Physics, University of Toronto</p>
+            <span class="news-card-cta">Read Document &rarr;</span>
+          </div>
+        </a>
+
+        <a href="testimonies/BUE.pdf" target="_blank" class="news-card">
+          <div class="news-card-inner">
+            <p class="news-card-label">Research Recognition · 2021</p>
+            <h3 class="news-card-title">Splitting of d-orbitals Research<br></h3>
+            <p class="news-card-desc">British University in Egypt, Cairo.</p>
+            <span class="news-card-cta">Read Document &rarr;</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 6 — ABOUT ME
+  ══════════════════════════════════════ -->
+  <section class="panel" id="about" data-bg="bg-about">
+    <div class="panel-content">
+      <p class="panel-eyebrow">Background</p>
+      <h2 class="panel-title">About Me</h2>
+      <div class="panel-divider"></div>
+      <p class="panel-body">
+        Born in Egypt, educated in Toronto — I am a physicist, educator, and
+        entrepreneur passionate about sustainable energy, scientific outreach,
+        and the power of mentorship. Member of CAP, APS, and IEEE.
+        Fluent in English and Arabic, conversational in French and Spanish.
+      </p>
+      <!-- <div class="placeholder-badge">Full Bio Coming Soon</div> -->
+      <div class="about-text">
+
+        <p class="about-para">
+          Since childhood, I've been fascinated by the complex geometry of space, topology, and the
+          nature of time. This propelled me toward theoretical physics — especially the intersection
+          of quantum mechanics and general relativity. My laboratory work on photosystem II using
+          X-ray diffraction and femtosecond spectroscopy deepened my appreciation for how fundamental
+          physics governs real biological processes, from light absorption to energy transfer. I am
+          driven both by the desire to understand the universe at its most fundamental level and to
+          see those principles at work in nature on a cosmological scale.
+        </p>
+
+        <p class="about-para">
+          When I'm not pondering philosophy, time, or physics, I will be concocting new coffee drinks
+          and taking walks. Despite my main interest being physics, I like to gain experiences in
+          human-based interactions — organizing events, university orientation, theatre operations.
+          Logistics, planning, and executing are traits I learned in physics and applied heavily in
+          those areas.
+        </p>
+
+        <p class="about-para">
+          I am an avid learner of all life has to offer. Sometimes all I truly desire is more time
+          to know more about life and realize how little I actually do know. Time… back to time. On
+          a more practical note, I also like inventions and elegant engineering solutions to
+          modern-day problems — which is why I am currently completing my WIPO training to prepare
+          my first patent submission.
+        </p>
+
+        <div class="about-quote">
+          <span class="about-quote-mark">&ldquo;</span>
+          <p>If you want to understand something, teach it.</p>
+          <span class="about-quote-attr">— Richard Feynman</span>
+        </div>
+
+        <p class="about-para">
+          After encountering Feynman's words, I accentuated my passion for teaching — hosting a
+          significant portion of my life with students from grade nine through third-year university,
+          mostly in science and mathematics. My time passes remarkably fast when discussing such
+          ideas, sparking new ways of thinking about the universe. It's a marvellous cycle. I always
+          strive to provide my students with deeper-level understanding and, more saliently,
+          genuine appreciation through our exuberant discussions.
+        </p>
+
+      </div>
+      <br><br><br><br><br><br><br><br><br><br><br><br><br>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SECTION 7 — CONTACT
+  ══════════════════════════════════════ -->
+  <section class="panel" id="contact" data-bg="bg-contact">
+    <div class="panel-content">
+      <p class="panel-eyebrow">Get In Touch</p>
+      <h2 class="panel-title">Contact</h2>
+      <div class="panel-divider"></div>
+      <p class="panel-body">
+        For research collaborations, tutoring inquiries, resume requests,
+        or startup partnerships — reach out directly at
+        <a href="mailto:taha@aboshanab.ca" style="color:var(--accent);text-decoration:none;">taha@aboshanab.ca</a>
+      </p>
+      <!-- <div class="placeholder-badge">Contact Form Coming Soon</div> -->
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    &copy; 2025 Taha Aboshanab &nbsp;·&nbsp;
+    <a href="mailto:taha@aboshanab.ca">taha@aboshanab.ca</a>
+    &nbsp;·&nbsp;
+    <a href="https://www.aboshanab.ca">aboshanab.ca</a>
+  </footer>
+
+  <script>
+    // ══════════════════════════════════════
+    // REFERENCES
+    // ══════════════════════════════════════
+    const panels   = Array.from(document.querySelectorAll('.panel'));
+    const navLinks = Array.from(document.querySelectorAll('.site-nav a'));
+    const bgLayers = document.querySelectorAll('.bg-layer');
+    const siteNav  = document.getElementById('site-nav');
+
+    // section id → bg-layer id
+    const bgMap = {
+      home:     'bg-home',
+      resume:   'bg-resume',
+      projects: 'bg-projects',
+      startup:  'bg-startup',
+      news:     'bg-news',
+      about:    'bg-about',
+      contact:  'bg-contact',
+    };
+
+    // ══════════════════════════════════════
+    // CROSSFADE BACKGROUND
+    // ══════════════════════════════════════
+    function activateBg(sectionId) {
+      const targetId = bgMap[sectionId];
+      bgLayers.forEach(layer => {
+        layer.classList.toggle('active', layer.id === targetId);
+      });
+    }
+
+    // ══════════════════════════════════════
+    // HIGHLIGHT ACTIVE NAV LINK
+    // ══════════════════════════════════════
+    function setActiveNav(sectionId) {
+      navLinks.forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + sectionId);
+      });
+    }
+
+    // ══════════════════════════════════════
+    // PANEL CONTENT REVEAL / EXIT
+    // IntersectionObserver fires when ≥30%
+    // of a panel is in the viewport.
+    // ══════════════════════════════════════
+    let currentSection = 'home';
+
+    const panelObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const content = entry.target.querySelector('.panel-content');
+        const id      = entry.target.id;
+
+        if (entry.isIntersecting) {
+          // Entering — reveal content, swap bg & nav
+          content.classList.remove('exit');
+          requestAnimationFrame(() => {
+            setTimeout(() => content.classList.add('visible'), 60);
+          });
+
+          if (id !== currentSection) {
+            currentSection = id;
+            activateBg(id);
+            setActiveNav(id);
+          }
+
+        } else {
+          const rect = entry.boundingClientRect;
+          if (rect.top < 0) {
+            // Scrolled past — exit upward
+            content.classList.add('exit');
+            content.classList.remove('visible');
+          } else {
+            // Approaching from below — reset to start state
+            content.classList.remove('visible', 'exit');
+          }
+        }
+      });
+    }, {
+      threshold: 0.55
+    });
+
+    panels.forEach(p => panelObserver.observe(p));
+
+    // ══════════════════════════════════════
+    // NAV TINT — transparent over hero,
+    // dark frosted glass over other sections
+    // ══════════════════════════════════════
+    const homeObserver = new IntersectionObserver(([entry]) => {
+      siteNav.classList.toggle('dark-bg', !entry.isIntersecting);
+    }, { threshold: 0.40 });
+
+    homeObserver.observe(document.getElementById('home'));
+
+    // ══════════════════════════════════════
+    // SMOOTH SCROLL with nav offset
+    // ══════════════════════════════════════
+    const NAV_H = parseInt(getComputedStyle(document.documentElement)
+                    .getPropertyValue('--nav-h')) || 52;
+
+    navLinks.forEach(a => {
+      a.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (!href || !href.startsWith('#')) return;
+        const target = document.querySelector(href);
+        if (!target) return;
+        e.preventDefault();
+        const top = target.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top, behavior: 'smooth' });
+      });
+    });
+
+    // ══════════════════════════════════════
+    // BOOT — show home content immediately
+    // ══════════════════════════════════════
+    activateBg('home');
+    setActiveNav('home');
+    setTimeout(() => {
+      document.querySelector('#home .panel-content').classList.add('visible');
+    }, 150);
+
+    // ══════════════════════════════════════
+    // ABOUT SECTION — scroll-driven darkening
+    // ══════════════════════════════════════
+    const aboutPanel  = document.getElementById('about');
+    const aboutBg     = document.getElementById('bg-about');
+
+    // Create a dedicated dark overlay div just for bg-about
+    const aboutDark = document.createElement('div');
+    aboutDark.style.cssText = `
+      position: absolute;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+      transition: opacity 0.15s ease;
+    `;
+    aboutBg.appendChild(aboutDark);
+
+    window.addEventListener('scroll', () => {
+      const rect    = aboutPanel.getBoundingClientRect();
+      const visible = -rect.top;           // how many px we've scrolled INTO the section
+      const total   = rect.height/3;         // total section height
+
+      // progress goes 0 → 1 as you scroll through the section
+      const progress = Math.min(Math.max(visible / total, 0), 1);
+
+      // opacity goes from 0 (top) → 0.65 (bottom) — adjust 0.65 to taste
+      aboutDark.style.opacity = (progress * 0.95).toFixed(3);
+    }, { passive: true });
+  </script>
+
+</body>
+</html>
